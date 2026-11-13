@@ -1,70 +1,114 @@
-// Auto-generated warmups + katas.
+// Auto-generated baby steps + katas.
 window.ZIG_KATAS = [
   {
-    "id": "warmup01",
-    "number": "Warmup 01",
-    "group": "Part 0 \u2014 Zero to First Green Test",
-    "title": "Your First Zig Function (const & var)",
-    "file": "warmup01_first_function.zig",
+    "id": "step01",
+    "number": "Step 01",
+    "group": "Part 0 \u2014 Baby Steps",
+    "title": "Make a const",
+    "file": "step01_const.zig",
+    "concepts": [
+      "const",
+      "i32",
+      "test"
+    ],
+    "lessonHtml": "\n<p>Every Zig program starts with values that don't change, called <code>const</code>.</p>\n<h3>Example</h3>\n<pre><code>const port: i32 = 8080;</code></pre>\n<p>In Zig, the type (<code>: i32</code> for a 32-bit integer) goes <strong>after</strong> the name, and every statement ends with a semicolon <code>;</code>.</p>\n<h3>Your Task</h3>\n<p>Inside the <code>test</code> block, declare <code>const answer: i32 = 42;</code> so the test passes!</p>\n",
+    "hint": "Replace `const answer: i32 = 0;` with `const answer: i32 = 42;`.",
+    "starter": "const std = @import(\"std\");\n\ntest \"make a const\" {\n    // TODO: change 0 to 42\n    const answer: i32 = 0;\n\n    try std.testing.expectEqual(@as(i32, 42), answer);\n}\n",
+    "solution": "const std = @import(\"std\");\n\ntest \"make a const\" {\n    const answer: i32 = 42;\n\n    try std.testing.expectEqual(@as(i32, 42), answer);\n}\n"
+  },
+  {
+    "id": "step02",
+    "number": "Step 02",
+    "group": "Part 0 \u2014 Baby Steps",
+    "title": "Arithmetic & var",
+    "file": "step02_arithmetic_and_var.zig",
+    "concepts": [
+      "+",
+      "*",
+      "var",
+      "+="
+    ],
+    "lessonHtml": "\n<p>You can do normal math with <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>. If a variable needs to change later, use <code>var</code> instead of <code>const</code>.</p>\n<h3>Example</h3>\n<pre><code>const a: i32 = 10;\nvar total: i32 = a * 2;\ntotal += 5; // now 25</code></pre>\n<h3>Your Task</h3>\n<ul>\n  <li>Set <code>sum</code> to <code>x + y</code>.</li>\n  <li>Change <code>score</code> from <code>const</code> to <code>var</code> and add <code>10</code> to it.</li>\n</ul>\n",
+    "hint": "Write `const sum: i32 = x + y;` and `var score: i32 = 5; score += 10;`.",
+    "starter": "const std = @import(\"std\");\n\ntest \"arithmetic and var\" {\n    const x: i32 = 6;\n    const y: i32 = 7;\n\n    // TODO: set sum to x + y\n    const sum: i32 = 0;\n\n    // TODO: change `const` to `var` and add 10 to score\n    const score: i32 = 5;\n\n    try std.testing.expectEqual(@as(i32, 13), sum);\n    try std.testing.expectEqual(@as(i32, 15), score);\n}\n",
+    "solution": "const std = @import(\"std\");\n\ntest \"arithmetic and var\" {\n    const x: i32 = 6;\n    const y: i32 = 7;\n\n    const sum: i32 = x + y;\n\n    var score: i32 = 5;\n    score += 10;\n\n    try std.testing.expectEqual(@as(i32, 13), sum);\n    try std.testing.expectEqual(@as(i32, 15), score);\n}\n"
+  },
+  {
+    "id": "step03",
+    "number": "Step 03",
+    "group": "Part 0 \u2014 Baby Steps",
+    "title": "Your First Function (fn)",
+    "file": "step03_functions.zig",
     "concepts": [
       "fn",
-      "const",
-      "var",
-      "i32",
       "return"
     ],
-    "lessonHtml": "\n<p>Welcome! Let's write your very first Zig function. In Zig, types go <strong>after</strong> the parameter name (just like TypeScript): <code>a: i32</code> means \"32-bit integer\".</p>\n<h3>Tiny Example</h3>\n<pre><code>fn double(x: i32) i32 {\n    return x * 2;\n}</code></pre>\n<p>Variables use <code>const</code> (cannot change) or <code>var</code> (can change). Note: Zig has <strong>no implicit returns</strong> \u2014 always write <code>return ...;</code>.</p>\n<h3>Your Task</h3>\n<ul>\n  <li>In <code>add</code>: return <code>a + b</code>.</li>\n  <li>In <code>incrementTwice</code>: change <code>const total</code> to <code>var total</code> so it can be mutated, add <code>2</code>, and return it.</li>\n</ul>\n",
-    "hint": "Replace `@panic(...)` with `return a + b;`. In `incrementTwice`, change `const total` to `var total: i32 = start;`, add `total += 2;`, and `return total;`.",
-    "starter": "const std = @import(\"std\");\n\n/// Return the sum of `a` and `b`.\npub fn add(a: i32, b: i32) i32 {\n    _ = a;\n    _ = b;\n    @panic(\"TODO: return a + b\");\n}\n\n/// Start at `start`, add 1 twice, and return the result.\npub fn incrementTwice(start: i32) i32 {\n    _ = start;\n    // Tip: use `var` instead of `const` when a variable changes!\n    @panic(\"TODO: implement incrementTwice\");\n}\n\ntest \"first zig functions\" {\n    try std.testing.expectEqual(@as(i32, 7), add(3, 4));\n    try std.testing.expectEqual(@as(i32, 12), incrementTwice(10));\n}\n",
-    "solution": "const std = @import(\"std\");\n\n/// Return the sum of `a` and `b`.\npub fn add(a: i32, b: i32) i32 {\n    return a + b;\n}\n\n/// Start at `start`, add 1 twice, and return the result.\npub fn incrementTwice(start: i32) i32 {\n    var total: i32 = start;\n    total += 1;\n    total += 1;\n    return total;\n}\n\ntest \"first zig functions\" {\n    try std.testing.expectEqual(@as(i32, 7), add(3, 4));\n    try std.testing.expectEqual(@as(i32, 12), incrementTwice(10));\n}\n"
+    "lessonHtml": "\n<p>Functions in Zig start with <code>fn</code>, list parameters with types, and end with the return type before <code>{</code>. Always use an explicit <code>return</code>.</p>\n<h3>Example</h3>\n<pre><code>fn double(n: i32) i32 {\n    return n * 2;\n}</code></pre>\n<h3>Your Task</h3>\n<p>Make <code>add(a, b)</code> return <code>a + b</code>.</p>\n",
+    "hint": "Remove `_ = a; _ = b;` and write `return a + b;`.",
+    "starter": "const std = @import(\"std\");\n\nfn add(a: i32, b: i32) i32 {\n    // TODO: return a + b\n    _ = a;\n    _ = b;\n    return 0;\n}\n\ntest \"first function\" {\n    try std.testing.expectEqual(@as(i32, 9), add(4, 5));\n    try std.testing.expectEqual(@as(i32, 0), add(-3, 3));\n}\n",
+    "solution": "const std = @import(\"std\");\n\nfn add(a: i32, b: i32) i32 {\n    return a + b;\n}\n\ntest \"first function\" {\n    try std.testing.expectEqual(@as(i32, 9), add(4, 5));\n    try std.testing.expectEqual(@as(i32, 0), add(-3, 3));\n}\n"
   },
   {
-    "id": "warmup02",
-    "number": "Warmup 02",
-    "group": "Part 0 \u2014 Zero to First Green Test",
-    "title": "Loops & Slices (for |item|)",
-    "file": "warmup02_loops_and_slices.zig",
+    "id": "step04",
+    "number": "Step 04",
+    "group": "Part 0 \u2014 Baby Steps",
+    "title": "if / else",
+    "file": "step04_if_else.zig",
+    "concepts": [
+      "if",
+      "else",
+      "bool"
+    ],
+    "lessonHtml": "\n<p><code>if</code> / <code>else</code> works just like TypeScript or C, and can also be used as an expression (like a ternary)!</p>\n<h3>Example</h3>\n<pre><code>if (a &gt; b) {\n    return a;\n} else {\n    return b;\n}</code></pre>\n<h3>Your Task</h3>\n<p>Implement <code>max(a, b)</code> to return the larger of the two numbers.</p>\n",
+    "hint": "Write `if (a > b) return a; return b;` (or `return if (a > b) a else b;`).",
+    "starter": "const std = @import(\"std\");\n\nfn max(a: i32, b: i32) i32 {\n    // TODO: return the larger number\n    _ = a;\n    _ = b;\n    return 0;\n}\n\ntest \"if and else\" {\n    try std.testing.expectEqual(@as(i32, 10), max(10, 3));\n    try std.testing.expectEqual(@as(i32, 8), max(2, 8));\n}\n",
+    "solution": "const std = @import(\"std\");\n\nfn max(a: i32, b: i32) i32 {\n    if (a > b) return a;\n    return b;\n}\n\ntest \"if and else\" {\n    try std.testing.expectEqual(@as(i32, 10), max(10, 3));\n    try std.testing.expectEqual(@as(i32, 8), max(2, 8));\n}\n"
+  },
+  {
+    "id": "step05",
+    "number": "Step 05",
+    "group": "Part 0 \u2014 Baby Steps",
+    "title": "for Loops & Slices",
+    "file": "step05_for_loops.zig",
     "concepts": [
       "[]const i32",
-      "for (items) |x|",
-      "if"
+      "for (nums) |n|"
     ],
-    "lessonHtml": "\n<p>In Python you write <code>for x in nums:</code>. In Zig, you put the loop variable inside pipes <code>|x|</code>:</p>\n<h3>Tiny Example</h3>\n<pre><code>var sum: i32 = 0;\nfor (nums) |n| {\n    sum += n;\n}</code></pre>\n<p>Here <code>nums: []const i32</code> is a <strong>slice</strong> (a read-only view of an array of integers).</p>\n<h3>Your Task</h3>\n<ul>\n  <li>In <code>sumAll</code>: loop over <code>nums</code> and return the total.</li>\n  <li>In <code>countPositive</code>: count how many numbers in <code>nums</code> are <code>&gt; 0</code>.</li>\n</ul>\n",
-    "hint": "Use `var total: i32 = 0; for (nums) |n| { total += n; } return total;`. For `countPositive`, use `var count: usize = 0;` and `if (n > 0) count += 1;`.",
-    "starter": "const std = @import(\"std\");\n\n/// Return the sum of all numbers in `nums`.\npub fn sumAll(nums: []const i32) i32 {\n    _ = nums;\n    @panic(\"TODO: loop over nums and sum them\");\n}\n\n/// Return how many numbers in `nums` are strictly greater than 0.\npub fn countPositive(nums: []const i32) usize {\n    _ = nums;\n    @panic(\"TODO: count numbers > 0\");\n}\n\ntest \"loops and slices\" {\n    try std.testing.expectEqual(@as(i32, 10), sumAll(&.{ 1, 2, 3, 4 }));\n    try std.testing.expectEqual(@as(i32, 0), sumAll(&.{}));\n    try std.testing.expectEqual(@as(usize, 2), countPositive(&.{ -5, 0, 3, 9, -1 }));\n}\n",
-    "solution": "const std = @import(\"std\");\n\n/// Return the sum of all numbers in `nums`.\npub fn sumAll(nums: []const i32) i32 {\n    var total: i32 = 0;\n    for (nums) |n| {\n        total += n;\n    }\n    return total;\n}\n\n/// Return how many numbers in `nums` are strictly greater than 0.\npub fn countPositive(nums: []const i32) usize {\n    var count: usize = 0;\n    for (nums) |n| {\n        if (n > 0) count += 1;\n    }\n    return count;\n}\n\ntest \"loops and slices\" {\n    try std.testing.expectEqual(@as(i32, 10), sumAll(&.{ 1, 2, 3, 4 }));\n    try std.testing.expectEqual(@as(i32, 0), sumAll(&.{}));\n    try std.testing.expectEqual(@as(usize, 2), countPositive(&.{ -5, 0, 3, 9, -1 }));\n}\n"
+    "lessonHtml": "\n<p>In Zig, you loop over a list (called a <strong>slice</strong>, like <code>[]const i32</code>) by putting the item variable inside pipes <code>|n|</code>.</p>\n<h3>Example</h3>\n<pre><code>var total: i32 = 0;\nfor (nums) |n| {\n    total += n;\n}</code></pre>\n<h3>Your Task</h3>\n<p>Implement <code>sumAll(nums)</code> to add up every number in <code>nums</code>.</p>\n",
+    "hint": "Use `var total: i32 = 0; for (nums) |n| { total += n; } return total;`.",
+    "starter": "const std = @import(\"std\");\n\nfn sumAll(nums: []const i32) i32 {\n    var total: i32 = 0;\n    // TODO: loop over `nums` with `for (nums) |n|` and add to `total`\n    _ = nums;\n    return total;\n}\n\ntest \"for loop\" {\n    try std.testing.expectEqual(@as(i32, 10), sumAll(&.{ 1, 2, 3, 4 }));\n    try std.testing.expectEqual(@as(i32, 0), sumAll(&.{}));\n}\n",
+    "solution": "const std = @import(\"std\");\n\nfn sumAll(nums: []const i32) i32 {\n    var total: i32 = 0;\n    for (nums) |n| {\n        total += n;\n    }\n    return total;\n}\n\ntest \"for loop\" {\n    try std.testing.expectEqual(@as(i32, 10), sumAll(&.{ 1, 2, 3, 4 }));\n    try std.testing.expectEqual(@as(i32, 0), sumAll(&.{}));\n}\n"
   },
   {
-    "id": "warmup03",
-    "number": "Warmup 03",
-    "group": "Part 0 \u2014 Zero to First Green Test",
-    "title": "Strings in Zig ([]const u8)",
-    "file": "warmup03_strings.zig",
+    "id": "step06",
+    "number": "Step 06",
+    "group": "Part 0 \u2014 Baby Steps",
+    "title": "Strings ([]const u8)",
+    "file": "step06_strings.zig",
     "concepts": [
       "[]const u8",
-      "std.mem.eql",
-      ".len"
+      "std.mem.eql"
     ],
-    "lessonHtml": "\n<p>Zig has <strong>no String class</strong> \u2014 a string is just a slice of bytes: <code>[]const u8</code>.</p>\n<p>Because slices are pointers + lengths, you <strong>cannot</strong> compare two strings with <code>a == b</code>. Always use <code>std.mem.eql(u8, a, b)</code>!</p>\n<h3>Tiny Example</h3>\n<pre><code>pub fn isZig(name: []const u8) bool {\n    return std.mem.eql(u8, name, \"zig\");\n}</code></pre>\n<h3>Your Task</h3>\n<ul>\n  <li>In <code>isGreeting</code>: return <code>true</code> if <code>text</code> equals <code>\"hello\"</code> or <code>\"hi\"</code>.</li>\n  <li>In <code>longerLen</code>: return the <code>.len</code> of whichever string is longer.</li>\n</ul>\n",
-    "hint": "Use `std.mem.eql(u8, text, \"hello\") or std.mem.eql(u8, text, \"hi\")`. For `longerLen`, use `@max(a.len, b.len)` or an `if (a.len > b.len)`.",
-    "starter": "const std = @import(\"std\");\n\n/// Return true if `text` is \"hello\" or \"hi\".\npub fn isGreeting(text: []const u8) bool {\n    _ = text;\n    @panic(\"TODO: compare text using std.mem.eql\");\n}\n\n/// Return the length of the longer string.\npub fn longerLen(a: []const u8, b: []const u8) usize {\n    _ = a;\n    _ = b;\n    @panic(\"TODO: return the max of a.len and b.len\");\n}\n\ntest \"strings\" {\n    try std.testing.expect(isGreeting(\"hello\"));\n    try std.testing.expect(isGreeting(\"hi\"));\n    try std.testing.expect(!isGreeting(\"bye\"));\n    try std.testing.expectEqual(@as(usize, 6), longerLen(\"zig\", \"golang\"));\n}\n",
-    "solution": "const std = @import(\"std\");\n\n/// Return true if `text` is \"hello\" or \"hi\".\npub fn isGreeting(text: []const u8) bool {\n    return std.mem.eql(u8, text, \"hello\") or std.mem.eql(u8, text, \"hi\");\n}\n\n/// Return the length of the longer string.\npub fn longerLen(a: []const u8, b: []const u8) usize {\n    return @max(a.len, b.len);\n}\n\ntest \"strings\" {\n    try std.testing.expect(isGreeting(\"hello\"));\n    try std.testing.expect(isGreeting(\"hi\"));\n    try std.testing.expect(!isGreeting(\"bye\"));\n    try std.testing.expectEqual(@as(usize, 6), longerLen(\"zig\", \"golang\"));\n}\n"
+    "lessonHtml": "\n<p>Strings in Zig are just byte slices: <code>[]const u8</code>. You can't use <code>==</code> on slices \u2014 always use <code>std.mem.eql(u8, a, b)</code>.</p>\n<h3>Example</h3>\n<pre><code>return std.mem.eql(u8, name, \"zig\");</code></pre>\n<h3>Your Task</h3>\n<p>Implement <code>isZig(text)</code> so it returns <code>true</code> only when <code>text</code> is <code>\"zig\"</code>.</p>\n",
+    "hint": "Write `return std.mem.eql(u8, text, \"zig\");`.",
+    "starter": "const std = @import(\"std\");\n\nfn isZig(text: []const u8) bool {\n    // TODO: return true if `text` equals \"zig\"\n    _ = text;\n    return false;\n}\n\ntest \"strings\" {\n    try std.testing.expect(isZig(\"zig\"));\n    try std.testing.expect(!isZig(\"rust\"));\n}\n",
+    "solution": "const std = @import(\"std\");\n\nfn isZig(text: []const u8) bool {\n    return std.mem.eql(u8, text, \"zig\");\n}\n\ntest \"strings\" {\n    try std.testing.expect(isZig(\"zig\"));\n    try std.testing.expect(!isZig(\"rust\"));\n}\n"
   },
   {
-    "id": "warmup04",
-    "number": "Warmup 04",
-    "group": "Part 0 \u2014 Zero to First Green Test",
-    "title": "Optionals (?T and orelse)",
-    "file": "warmup04_optionals.zig",
+    "id": "step07",
+    "number": "Step 07",
+    "group": "Part 0 \u2014 Baby Steps",
+    "title": "Optionals (?T & orelse)",
+    "file": "step07_optionals.zig",
     "concepts": [
       "?i32",
       "null",
       "orelse"
     ],
-    "lessonHtml": "\n<p>In Python/JS any variable can be <code>None</code>/<code>null</code>. In Zig, a type can only be <code>null</code> if it has a <code>?</code> in front: <code>?i32</code>.</p>\n<h3>Tiny Example</h3>\n<pre><code>// Unwrap an optional with a fallback value:\nconst val = maybe_num orelse 0;</code></pre>\n<h3>Your Task</h3>\n<ul>\n  <li>In <code>firstEven</code>: loop over <code>nums</code>; return the first even number (<code>@mod(n, 2) == 0</code>), or <code>null</code> if none exists.</li>\n  <li>In <code>unwrapOrZero</code>: return <code>maybe</code>'s value, or <code>0</code> if it's <code>null</code>.</li>\n</ul>\n",
-    "hint": "In `firstEven`: `for (nums) |n| { if (@mod(n, 2) == 0) return n; } return null;`. In `unwrapOrZero`: `return maybe orelse 0;`.",
-    "starter": "const std = @import(\"std\");\n\n/// Return the first even number in `nums`, or `null` if there are none.\npub fn firstEven(nums: []const i32) ?i32 {\n    _ = nums;\n    @panic(\"TODO: return first even number or null\");\n}\n\n/// Return the value inside `maybe`, or 0 if it is `null`.\npub fn unwrapOrZero(maybe: ?i32) i32 {\n    _ = maybe;\n    @panic(\"TODO: use `orelse`\");\n}\n\ntest \"optionals\" {\n    try std.testing.expectEqual(@as(?i32, 4), firstEven(&.{ 1, 3, 4, 6 }));\n    try std.testing.expectEqual(@as(?i32, null), firstEven(&.{ 1, 3, 5 }));\n    try std.testing.expectEqual(@as(i32, 42), unwrapOrZero(42));\n    try std.testing.expectEqual(@as(i32, 0), unwrapOrZero(null));\n}\n",
-    "solution": "const std = @import(\"std\");\n\n/// Return the first even number in `nums`, or `null` if there are none.\npub fn firstEven(nums: []const i32) ?i32 {\n    for (nums) |n| {\n        if (@mod(n, 2) == 0) return n;\n    }\n    return null;\n}\n\n/// Return the value inside `maybe`, or 0 if it is `null`.\npub fn unwrapOrZero(maybe: ?i32) i32 {\n    return maybe orelse 0;\n}\n\ntest \"optionals\" {\n    try std.testing.expectEqual(@as(?i32, 4), firstEven(&.{ 1, 3, 4, 6 }));\n    try std.testing.expectEqual(@as(?i32, null), firstEven(&.{ 1, 3, 5 }));\n    try std.testing.expectEqual(@as(i32, 42), unwrapOrZero(42));\n    try std.testing.expectEqual(@as(i32, 0), unwrapOrZero(null));\n}\n"
+    "lessonHtml": "\n<p>Normal Zig variables can <strong>never</strong> be <code>null</code>. To allow <code>null</code>, put <code>?</code> in front of the type (e.g. <code>?i32</code>), and unwrap it with <code>orelse</code>.</p>\n<h3>Example</h3>\n<pre><code>const val = maybe_num orelse 0;</code></pre>\n<h3>Your Task</h3>\n<p>Implement <code>unwrapOrZero</code> using <code>orelse</code>.</p>\n",
+    "hint": "Write `return maybe orelse 0;`.",
+    "starter": "const std = @import(\"std\");\n\nfn unwrapOrZero(maybe: ?i32) i32 {\n    // TODO: return the number inside `maybe`, or 0 if it is null\n    _ = maybe;\n    return -1;\n}\n\ntest \"optionals\" {\n    try std.testing.expectEqual(@as(i32, 42), unwrapOrZero(42));\n    try std.testing.expectEqual(@as(i32, 0), unwrapOrZero(null));\n}\n",
+    "solution": "const std = @import(\"std\");\n\nfn unwrapOrZero(maybe: ?i32) i32 {\n    return maybe orelse 0;\n}\n\ntest \"optionals\" {\n    try std.testing.expectEqual(@as(i32, 42), unwrapOrZero(42));\n    try std.testing.expectEqual(@as(i32, 0), unwrapOrZero(null));\n}\n"
   },
   {
     "id": "kata01",
