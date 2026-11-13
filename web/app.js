@@ -18,6 +18,8 @@
   const lessonTitleEl = document.getElementById("lesson-title");
   const conceptListEl = document.getElementById("concept-list");
   const lessonBodyEl = document.getElementById("lesson-body");
+  const hintBoxEl = document.getElementById("hint-box");
+  const hintTextEl = document.getElementById("hint-text");
   const editorFilenameEl = document.getElementById("editor-filename");
   const editorStageEl = document.getElementById("editor-stage");
   const editorHighlightEl = document.getElementById("editor-highlight");
@@ -115,8 +117,16 @@
     }
 
     lessonBodyEl.innerHTML = kata.lessonHtml;
+    if (kata.hint) {
+      hintBoxEl.hidden = false;
+      hintBoxEl.open = false;
+      hintTextEl.innerHTML = kata.hint.replace(/`([^`]+)`/g, "<code>$1</code>");
+    } else {
+      hintBoxEl.hidden = true;
+    }
     editorEl.value = savedCode[kata.id] ?? kata.starter;
     renderHighlight();
+    highlightLessonExamples();
 
     btnPrev.disabled = idx === 0;
     btnNext.disabled = idx === katas.length - 1;
@@ -137,6 +147,21 @@
     syncScroll();
   }
 
+  function highlightLessonExamples() {
+    if (!highlighter) return;
+    lessonBodyEl.querySelectorAll("pre code").forEach((codeEl) => {
+      const pre = codeEl.parentElement;
+      const html = highlighter.codeToHtml(codeEl.textContent || "", {
+        lang: "zig",
+        theme: "github-dark",
+      });
+      const wrapper = document.createElement("div");
+      wrapper.innerHTML = html;
+      const shikiPre = wrapper.firstElementChild;
+      if (shikiPre && pre) pre.replaceWith(shikiPre);
+    });
+  }
+
   function syncScroll() {
     editorHighlightEl.scrollTop = editorEl.scrollTop;
     editorHighlightEl.scrollLeft = editorEl.scrollLeft;
@@ -151,6 +176,7 @@
       });
       editorStageEl.classList.add("shiki-ready");
       renderHighlight();
+      highlightLessonExamples();
 
       // Highlight Zig 101 Guide code blocks
       document.querySelectorAll(".guide-section pre code").forEach((codeEl) => {
