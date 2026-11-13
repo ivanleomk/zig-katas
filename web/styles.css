@@ -390,6 +390,131 @@ html, body {
   padding: 0;
 }
 
+.byte-viz {
+  margin: 16px 0;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.byte-viz-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.byte-viz-input {
+  flex: 1;
+  min-width: 140px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.byte-viz-preset {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.byte-viz-preset:hover {
+  color: var(--text);
+  background: var(--surface-muted);
+}
+
+.slice-fat-ptr {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+.slice-fat-ptr span {
+  padding: 5px 10px;
+  border-right: 1px solid var(--border);
+}
+
+.slice-fat-ptr span:last-child {
+  border-right: none;
+}
+
+.byte-cells {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.byte-cell {
+  min-width: 58px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  text-align: center;
+  font-family: var(--font-mono);
+}
+
+.byte-cell.match {
+  border-color: #9cd4b5;
+  background: var(--pass-soft);
+}
+
+.byte-cell.mismatch {
+  border-color: #e6aba4;
+  background: var(--fail-soft);
+}
+
+.byte-cell-idx {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.byte-cell-char {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 2px 0;
+}
+
+.byte-cell-num {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.byte-eql-result {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--surface-muted);
+}
+
+.byte-eql-result.pass {
+  background: var(--pass-soft);
+  color: var(--pass);
+}
+
+.byte-eql-result.fail {
+  background: var(--fail-soft);
+  color: var(--fail);
+}
+
 .hint-box {
   margin-top: 18px;
   background: var(--accent-soft);

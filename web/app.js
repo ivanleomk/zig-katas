@@ -128,6 +128,7 @@
     editorEl.value = savedCode[kata.id] ?? kata.starter;
     renderHighlight();
     highlightLessonExamples();
+    initByteVisualizer();
 
     btnPrev.disabled = idx === 0;
     btnNext.disabled = idx === katas.length - 1;
@@ -146,6 +147,64 @@
       theme: "github-dark",
     });
     syncScroll();
+  }
+
+  function initByteVisualizer() {
+    const root = document.getElementById("byte-viz");
+    if (!root) return;
+
+    const input = document.getElementById("byte-viz-input");
+    const ptrEl = document.getElementById("byte-viz-ptr");
+    const cellsEl = document.getElementById("byte-viz-cells");
+    const eqlEl = document.getElementById("byte-viz-eql");
+    const encoder = new TextEncoder();
+    const targetBytes = encoder.encode("zig");
+
+    function render() {
+      const bytes = encoder.encode(input.value);
+      ptrEl.innerHTML =
+        `<span><strong>[]const u8</strong></span>` +
+        `<span>ptr: 0x1040</span>` +
+        `<span>len: ${bytes.length}</span>`;
+
+      cellsEl.innerHTML = "";
+      bytes.forEach((b, i) => {
+        const cell = document.createElement("div");
+        const isMatch = i < targetBytes.length && b === targetBytes[i];
+        const isMismatch = i < targetBytes.length ? b !== targetBytes[i] : true;
+        cell.className = "byte-cell " + (isMatch ? "match" : isMismatch ? "mismatch" : "");
+
+        const ch = b >= 32 && b <= 126 ? `'${String.fromCharCode(b)}'` : "·";
+        const hex = "0x" + b.toString(16).toUpperCase().padStart(2, "0");
+        cell.innerHTML =
+          `<div class="byte-cell-idx">[${i}]</div>` +
+          `<div class="byte-cell-char">${ch}</div>` +
+          `<div class="byte-cell-num">${b} · ${hex}</div>`;
+        cellsEl.appendChild(cell);
+      });
+
+      const exactMatch =
+        bytes.length === targetBytes.length &&
+        bytes.every((b, i) => b === targetBytes[i]);
+
+      eqlEl.className = "byte-eql-result " + (exactMatch ? "pass" : "fail");
+      if (bytes.length !== targetBytes.length) {
+        eqlEl.textContent = `std.mem.eql(u8, input, "zig") → false (len ${bytes.length} != 3)`;
+      } else if (exactMatch) {
+        eqlEl.textContent = `std.mem.eql(u8, input, "zig") → true (len == 3 and all 3 bytes match!)`;
+      } else {
+        eqlEl.textContent = `std.mem.eql(u8, input, "zig") → false (bytes differ)`;
+      }
+    }
+
+    input.addEventListener("input", render);
+    root.querySelectorAll(".byte-viz-preset").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        input.value = btn.dataset.val;
+        render();
+      });
+    });
+    render();
   }
 
   function highlightLessonExamples() {
