@@ -29,6 +29,7 @@
   const consoleOutputEl = document.getElementById("console-output");
 
   const btnRun = document.getElementById("btn-run");
+  const btnFmt = document.getElementById("btn-fmt");
   const btnReset = document.getElementById("btn-reset");
   const btnSolution = document.getElementById("btn-solution");
   const btnPrev = document.getElementById("btn-prev");
@@ -275,7 +276,42 @@
     selectKata(0);
   });
 
+  async function formatCode() {
+    const kata = katas[currentIdx];
+    const code = editorEl.value;
+    btnFmt.disabled = true;
+    try {
+      const resp = await fetch("/api/fmt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      if (data.ok) {
+        editorEl.value = data.code;
+        if (!showingSolution) {
+          savedCode[kata.id] = data.code;
+          saveJson(STORAGE_CODE_KEY, savedCode);
+        }
+        renderHighlight();
+        consoleStatusEl.textContent = "Formatted with `zig fmt`";
+      } else {
+        consoleBadgeEl.hidden = false;
+        consoleBadgeEl.className = "console-badge fail";
+        consoleBadgeEl.textContent = "FMT ERR";
+        consoleStatusEl.textContent = "Syntax error — could not format";
+        consoleOutputEl.textContent = data.error || "Invalid Zig syntax";
+      }
+    } catch {
+      consoleStatusEl.textContent = "Formatter requires the local/Cloud Run server";
+    } finally {
+      btnFmt.disabled = false;
+    }
+  }
+
   btnRun.addEventListener("click", runTests);
+  btnFmt.addEventListener("click", formatCode);
 
   btnReset.addEventListener("click", () => {
     const kata = katas[currentIdx];
@@ -326,6 +362,11 @@
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
       e.preventDefault();
       runTests();
+      return;
+    }
+    if (e.shiftKey && e.altKey && e.code === "KeyF") {
+      e.preventDefault();
+      formatCode();
       return;
     }
     if (e.key === "Tab") {

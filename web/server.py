@@ -42,7 +42,7 @@ class KataHandler(http.server.SimpleHTTPRequestHandler):
         super().do_GET()
 
     def do_POST(self):
-        if self.path != "/api/run-test":
+        if self.path not in ("/api/run-test", "/api/fmt"):
             self._send_json(404, {"error": "Not found"})
             return
 
@@ -59,6 +59,23 @@ class KataHandler(http.server.SimpleHTTPRequestHandler):
                 return
         except Exception as exc:
             self._send_json(400, {"error": f"Invalid JSON: {exc}"})
+            return
+
+        if self.path == "/api/fmt":
+            try:
+                proc = subprocess.run(
+                    [ZIG_BIN, "fmt", "--stdin"],
+                    input=code,
+                    capture_output=True,
+                    text=True,
+                    timeout=5,
+                )
+                if proc.returncode == 0:
+                    self._send_json(200, {"ok": True, "code": proc.stdout})
+                else:
+                    self._send_json(200, {"ok": False, "error": proc.stderr.strip()})
+            except Exception as exc:
+                self._send_json(500, {"error": str(exc)})
             return
 
         start = time.monotonic()
