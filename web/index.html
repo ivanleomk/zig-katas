@@ -55,14 +55,17 @@
           </div>
         </div>
 
-        <textarea
-          id="code-editor"
-          class="code-editor"
-          spellcheck="false"
-          autocomplete="off"
-          autocapitalize="off"
-          aria-label="Zig code editor"
-        ></textarea>
+        <div id="editor-stage" class="editor-stage">
+          <div id="editor-highlight" class="editor-highlight" aria-hidden="true"></div>
+          <textarea
+            id="code-editor"
+            class="code-editor"
+            spellcheck="false"
+            autocomplete="off"
+            autocapitalize="off"
+            aria-label="Zig code editor"
+          ></textarea>
+        </div>
 
         <div class="console-panel">
           <div class="console-header">
@@ -149,6 +152,6 @@ try list.append(gpa, 42);</code></pre>
   </main>
 
   <script src="./katas-data.js"></script>
-  <script src="./app.js"></script>
+  <script type="module" src="./app.js"></script>
 </body>
 </html>

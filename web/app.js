@@ -6,6 +6,7 @@
   let currentIdx = 0;
   let showingSolution = false;
   let serverOnline = false;
+  let highlighter = null;
 
   const savedCode = loadJson(STORAGE_CODE_KEY, {});
   const passedMap = loadJson(STORAGE_PASS_KEY, {});
@@ -18,6 +19,8 @@
   const conceptListEl = document.getElementById("concept-list");
   const lessonBodyEl = document.getElementById("lesson-body");
   const editorFilenameEl = document.getElementById("editor-filename");
+  const editorStageEl = document.getElementById("editor-stage");
+  const editorHighlightEl = document.getElementById("editor-highlight");
   const editorEl = document.getElementById("code-editor");
   const consoleStatusEl = document.getElementById("console-status");
   const consoleBadgeEl = document.getElementById("console-badge");
@@ -113,12 +116,57 @@
 
     lessonBodyEl.innerHTML = kata.lessonHtml;
     editorEl.value = savedCode[kata.id] ?? kata.starter;
+    renderHighlight();
 
     btnPrev.disabled = idx === 0;
     btnNext.disabled = idx === katas.length - 1;
 
     clearConsole();
     renderSidebar();
+  }
+
+  function renderHighlight() {
+    if (!highlighter) return;
+    // Append a space after trailing newline so Shiki's <pre> height matches <textarea>
+    const raw = editorEl.value;
+    const code = raw.endsWith("\n") ? raw + " " : raw;
+    editorHighlightEl.innerHTML = highlighter.codeToHtml(code, {
+      lang: "zig",
+      theme: "github-dark",
+    });
+    syncScroll();
+  }
+
+  function syncScroll() {
+    editorHighlightEl.scrollTop = editorEl.scrollTop;
+    editorHighlightEl.scrollLeft = editorEl.scrollLeft;
+  }
+
+  async function initShiki() {
+    try {
+      const { createHighlighter } = await import("https://esm.sh/shiki@3");
+      highlighter = await createHighlighter({
+        themes: ["github-dark"],
+        langs: ["zig"],
+      });
+      editorStageEl.classList.add("shiki-ready");
+      renderHighlight();
+
+      // Highlight Zig 101 Guide code blocks
+      document.querySelectorAll(".guide-section pre code").forEach((codeEl) => {
+        const pre = codeEl.parentElement;
+        const html = highlighter.codeToHtml(codeEl.textContent || "", {
+          lang: "zig",
+          theme: "github-dark",
+        });
+        const wrapper = document.createElement("div");
+        wrapper.innerHTML = html;
+        const shikiPre = wrapper.firstElementChild;
+        if (shikiPre && pre) pre.replaceWith(shikiPre);
+      });
+    } catch {
+      // Fallback: plain textarea remains visible if CDN is unreachable
+    }
   }
 
   function clearConsole() {
@@ -210,6 +258,7 @@
     editorEl.value = kata.starter;
     delete savedCode[kata.id];
     saveJson(STORAGE_CODE_KEY, savedCode);
+    renderHighlight();
     clearConsole();
   });
 
@@ -225,6 +274,7 @@
       editorEl.value = savedCode[kata.id] ?? kata.starter;
       btnSolution.textContent = "Show Solution";
     }
+    renderHighlight();
   });
 
   btnPrev.addEventListener("click", () => {
@@ -236,12 +286,15 @@
   });
 
   editorEl.addEventListener("input", () => {
+    renderHighlight();
     if (!showingSolution) {
       const kata = katas[currentIdx];
       savedCode[kata.id] = editorEl.value;
       saveJson(STORAGE_CODE_KEY, savedCode);
     }
   });
+
+  editorEl.addEventListener("scroll", syncScroll);
 
   editorEl.addEventListener("keydown", (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
@@ -255,6 +308,7 @@
       const end = editorEl.selectionEnd;
       editorEl.value = editorEl.value.slice(0, start) + "    " + editorEl.value.slice(end);
       editorEl.selectionStart = editorEl.selectionEnd = start + 4;
+      renderHighlight();
     }
   });
 
@@ -271,4 +325,5 @@
 
   updateProgress();
   if (katas.length > 0) selectKata(0);
+  initShiki();
 })();
