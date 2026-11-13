@@ -4,6 +4,19 @@ Built for experienced Python / TypeScript / C# / Rust engineers with **zero prio
 
 ---
 
+## Interactive Web Tutorial (No Local File Editing Needed)
+
+Prefer learning in the browser with a live `zig test` runner? Start the local web UI:
+
+```bash
+python3 web/server.py
+# Open http://127.0.0.1:8787
+```
+
+It includes the **Zig 101 Guide**, all **10 interactive katas**, a **Show Solution** toggle, and real-time `zig test` execution.
+
+---
+
 ## Step 1: Never Written Zig Before? Start Here!
 
 Read **[`ZIG_101.md`](./ZIG_101.md)** (~10–15 minutes). It translates every Zig concept—slices, optionals, error unions, `defer`/`errdefer`, explicit allocators, `comptime` generics, `Io.Writer`, and binary framing—directly from Python / TypeScript / Rust.

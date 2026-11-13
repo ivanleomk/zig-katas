@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>zig-katas — Learn Zig 0.17 Interactively</title>
+  <meta name="description" content="Interactive Zig 0.17 tutorial and 10-kata coding dojo in the browser." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">Z</span>
+      <span>zig-katas</span>
+      <span class="version-tag">Zig 0.17.1</span>
+    </div>
+
+    <nav class="nav-tabs" aria-label="Primary">
+      <button class="nav-tab active" data-view="katas" type="button">Interactive Katas</button>
+      <button class="nav-tab" data-view="guide" type="button">Zig 101 Guide</button>
+    </nav>
+
+    <div class="topbar-right">
+      <span id="progress-pill" class="progress-pill">0 / 10 passed</span>
+      <a class="gh-link" href="https://github.com/ivanleomk/zig-katas" target="_blank" rel="noreferrer">GitHub</a>
+    </div>
+  </header>
+
+  <main id="view-katas" class="view active">
+    <div class="workspace">
+      <aside id="sidebar" class="sidebar" aria-label="Kata Curriculum"></aside>
+
+      <section class="lesson-pane">
+        <div id="lesson-eyebrow" class="lesson-eyebrow"></div>
+        <h1 id="lesson-title" class="lesson-title"></h1>
+        <div id="concept-list" class="concept-list"></div>
+        <div id="lesson-body" class="lesson-body"></div>
+
+        <div class="lesson-nav">
+          <button id="btn-prev" class="btn" type="button">← Previous</button>
+          <button id="btn-next" class="btn" type="button">Next →</button>
+        </div>
+      </section>
+
+      <section class="editor-pane">
+        <div class="editor-toolbar">
+          <span id="editor-filename" class="editor-filename"></span>
+          <div class="toolbar-actions">
+            <button id="btn-reset" class="btn btn-dark" type="button">Reset</button>
+            <button id="btn-solution" class="btn btn-dark" type="button">Show Solution</button>
+            <button id="btn-run" class="btn btn-primary" type="button">Run Tests (⌘↵)</button>
+          </div>
+        </div>
+
+        <textarea
+          id="code-editor"
+          class="code-editor"
+          spellcheck="false"
+          autocomplete="off"
+          autocapitalize="off"
+          aria-label="Zig code editor"
+        ></textarea>
+
+        <div class="console-panel">
+          <div class="console-header">
+            <span id="console-status">Ready — click Run Tests or press ⌘/Ctrl + Enter</span>
+            <span id="console-badge" class="console-badge" hidden></span>
+          </div>
+          <pre id="console-output" class="console-output"></pre>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <main id="view-guide" class="view">
+    <div class="guide-scroll">
+      <article class="guide-container">
+        <div class="guide-hero">
+          <h1>Zig 101 — Everything You Need in 15 Minutes</h1>
+          <p>
+            Written for Python, TypeScript, C#, and Rust engineers. Zig's core rule is simple:
+            <strong>no hidden control flow, no hidden allocations, no macros.</strong>
+          </p>
+          <button id="btn-start-katas" class="btn btn-primary" type="button">Start Kata 01 →</button>
+        </div>
+
+        <section class="guide-section">
+          <h2>1. The Symbol Decoder Ring</h2>
+          <table class="symbol-table">
+            <thead>
+              <tr>
+                <th>Symbol</th>
+                <th>Example</th>
+                <th>Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>.{ ... }</code></td><td><code>.{ .host = "localhost", .port = 8080 }</code></td><td>Anonymous struct or tuple literal; type inferred from context.</td></tr>
+              <tr><td><code>.name</code></td><td><code>.running</code>, <code>.empty</code>, <code>.little</code></td><td>Inferred enum or declaration literal.</td></tr>
+              <tr><td><code>[]const u8</code></td><td><code>const s: []const u8 = "zig";</code></td><td>Read-only byte slice (pointer + length). Zig's string type.</td></tr>
+              <tr><td><code>?T</code> / <code>orelse</code></td><td><code>const i = idx orelse return error.Bad;</code></td><td>Optional (<code>T</code> or <code>null</code>). Normal pointers cannot be null.</td></tr>
+              <tr><td><code>!T</code> / <code>try</code></td><td><code>const n = try parse(s);</code></td><td>Error union. <code>try</code> returns the error early if it failed.</td></tr>
+              <tr><td><code>|val|</code></td><td><code>if (opt) |v|</code>, <code>for (arr, 0..) |x, i|</code></td><td>Payload capture (binds unwrapped value or loop item).</td></tr>
+              <tr><td><code>@builtin</code></td><td><code>@bitCast(x)</code>, <code>@typeInfo(T)</code></td><td>Compiler builtin (replaces C macros and unsafe casts).</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="guide-section">
+          <h2>2. Mutability, Slices &amp; Loops</h2>
+          <p>Use <code>const</code> by default and <code>var</code> only when mutating. Zig gives a compile error for unused variables or <code>var</code>s that are never mutated. Never compare slices with <code>==</code>; use <code>std.mem.eql(u8, a, b)</code>.</p>
+          <pre><code>const port: u16 = 8080;
+var count: usize = 0;
+for (items, 0..) |item, i| {
+    if (item == target) count += i;
+}</code></pre>
+        </section>
+
+        <section class="guide-section">
+          <h2>3. Errors, <code>defer</code> &amp; <code>errdefer</code></h2>
+          <p>Zig has no exceptions and no RAII destructors. Pair every allocation with <code>defer</code> (always runs on scope exit, LIFO) or <code>errdefer</code> (runs only if returning an error).</p>
+          <pre><code>const scratch = try allocator.alloc(u8, 64);
+defer allocator.free(scratch);
+
+const result = try allocator.alloc(u8, 32);
+errdefer allocator.free(result); // freed only on error!</code></pre>
+        </section>
+
+        <section class="guide-section">
+          <h2>4. Explicit Allocators &amp; Leak Detection</h2>
+          <p>Functions that allocate accept <code>allocator: std.mem.Allocator</code>. In tests, pass <code>std.testing.allocator</code> — it automatically fails the test if even 1 byte is leaked.</p>
+          <pre><code>var list: std.ArrayList(i32) = .empty;
+defer list.deinit(gpa);
+try list.append(gpa, 42);</code></pre>
+        </section>
+
+        <section class="guide-section">
+          <h2>5. <code>comptime</code> &amp; <code>Io.Writer</code></h2>
+          <p>Types are first-class values at <code>comptime</code>, so generic containers are functions returning <code>type</code>. In Zig 0.17, streaming output uses <code>*std.Io.Writer</code> and custom formatting uses <code>pub fn format(self, w: *Io.Writer)</code> with <code>{f}</code>.</p>
+          <pre><code>fn RingBuffer(comptime T: type, comptime cap: usize) type {
+    return struct { items: [cap]T = undefined, ... };
+}</code></pre>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <script src="./katas-data.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

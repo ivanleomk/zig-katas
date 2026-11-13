@@ -1,0 +1,274 @@
+(() => {
+  const katas = window.ZIG_KATAS || [];
+  const STORAGE_CODE_KEY = "zig_katas_code_v1";
+  const STORAGE_PASS_KEY = "zig_katas_passed_v1";
+
+  let currentIdx = 0;
+  let showingSolution = false;
+  let serverOnline = false;
+
+  const savedCode = loadJson(STORAGE_CODE_KEY, {});
+  const passedMap = loadJson(STORAGE_PASS_KEY, {});
+
+  // DOM refs
+  const sidebarEl = document.getElementById("sidebar");
+  const progressPillEl = document.getElementById("progress-pill");
+  const lessonEyebrowEl = document.getElementById("lesson-eyebrow");
+  const lessonTitleEl = document.getElementById("lesson-title");
+  const conceptListEl = document.getElementById("concept-list");
+  const lessonBodyEl = document.getElementById("lesson-body");
+  const editorFilenameEl = document.getElementById("editor-filename");
+  const editorEl = document.getElementById("code-editor");
+  const consoleStatusEl = document.getElementById("console-status");
+  const consoleBadgeEl = document.getElementById("console-badge");
+  const consoleOutputEl = document.getElementById("console-output");
+
+  const btnRun = document.getElementById("btn-run");
+  const btnReset = document.getElementById("btn-reset");
+  const btnSolution = document.getElementById("btn-solution");
+  const btnPrev = document.getElementById("btn-prev");
+  const btnNext = document.getElementById("btn-next");
+  const btnStartKatas = document.getElementById("btn-start-katas");
+
+  function loadJson(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function saveJson(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+      // Ignore storage quota errors
+    }
+  }
+
+  function updateProgress() {
+    const passedCount = katas.filter((k) => passedMap[k.id]).length;
+    progressPillEl.textContent = `${passedCount} / ${katas.length} passed`;
+  }
+
+  function renderSidebar() {
+    sidebarEl.innerHTML = "";
+    const groups = new Map();
+    katas.forEach((kata, idx) => {
+      if (!groups.has(kata.group)) groups.set(kata.group, []);
+      groups.get(kata.group).push({ kata, idx });
+    });
+
+    for (const [groupName, items] of groups.entries()) {
+      const groupEl = document.createElement("div");
+      groupEl.className = "sidebar-group";
+
+      const titleEl = document.createElement("div");
+      titleEl.className = "sidebar-group-title";
+      titleEl.textContent = groupName;
+      groupEl.appendChild(titleEl);
+
+      for (const { kata, idx } of items) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "kata-item" + (idx === currentIdx ? " active" : "");
+
+        const label = document.createElement("span");
+        label.className = "kata-item-label";
+        label.textContent = `${kata.number.replace("Kata ", "")}. ${kata.title}`;
+
+        const status = document.createElement("span");
+        const isPassed = Boolean(passedMap[kata.id]);
+        status.className = "kata-status" + (isPassed ? " passed" : "");
+        status.textContent = isPassed ? "PASS" : "TODO";
+
+        btn.appendChild(label);
+        btn.appendChild(status);
+        btn.addEventListener("click", () => selectKata(idx));
+        groupEl.appendChild(btn);
+      }
+
+      sidebarEl.appendChild(groupEl);
+    }
+  }
+
+  function selectKata(idx) {
+    currentIdx = idx;
+    showingSolution = false;
+    btnSolution.textContent = "Show Solution";
+
+    const kata = katas[idx];
+    lessonEyebrowEl.textContent = `${kata.group} · ${kata.number}`;
+    lessonTitleEl.textContent = kata.title;
+    editorFilenameEl.textContent = kata.file;
+
+    conceptListEl.innerHTML = "";
+    for (const concept of kata.concepts) {
+      const tag = document.createElement("span");
+      tag.className = "concept-tag";
+      tag.textContent = concept;
+      conceptListEl.appendChild(tag);
+    }
+
+    lessonBodyEl.innerHTML = kata.lessonHtml;
+    editorEl.value = savedCode[kata.id] ?? kata.starter;
+
+    btnPrev.disabled = idx === 0;
+    btnNext.disabled = idx === katas.length - 1;
+
+    clearConsole();
+    renderSidebar();
+  }
+
+  function clearConsole() {
+    consoleBadgeEl.hidden = true;
+    consoleOutputEl.textContent = "";
+    consoleStatusEl.textContent = serverOnline
+      ? "Ready — click Run Tests or press ⌘/Ctrl + Enter"
+      : "Static mode — run `python3 web/server.py` locally to execute `zig test` in browser";
+  }
+
+  async function runTests() {
+    const kata = katas[currentIdx];
+    const code = editorEl.value;
+    savedCode[kata.id] = code;
+    saveJson(STORAGE_CODE_KEY, savedCode);
+
+    btnRun.disabled = true;
+    consoleBadgeEl.hidden = true;
+    consoleStatusEl.textContent = "Compiling and running `zig test`...";
+    consoleOutputEl.textContent = "";
+
+    try {
+      const resp = await fetch("/api/run-test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+
+      if (!resp.ok) {
+        throw new Error(`HTTP ${resp.status}`);
+      }
+
+      const data = await resp.json();
+      consoleBadgeEl.hidden = false;
+      if (data.ok) {
+        consoleBadgeEl.className = "console-badge pass";
+        consoleBadgeEl.textContent = `PASS (${data.durationMs}ms)`;
+        consoleStatusEl.textContent = `${kata.number} passed all tests!`;
+        consoleOutputEl.textContent = (data.stderr || data.stdout || "All tests passed.").trim();
+        passedMap[kata.id] = true;
+        saveJson(STORAGE_PASS_KEY, passedMap);
+        updateProgress();
+        renderSidebar();
+      } else {
+        consoleBadgeEl.className = "console-badge fail";
+        consoleBadgeEl.textContent = `FAIL (${data.durationMs}ms)`;
+        consoleStatusEl.textContent = "Compilation or test failure";
+        consoleOutputEl.textContent = [data.stderr, data.stdout].filter(Boolean).join("\n").trim();
+      }
+    } catch {
+      consoleBadgeEl.hidden = false;
+      consoleBadgeEl.className = "console-badge fail";
+      consoleBadgeEl.textContent = "OFFLINE";
+      consoleStatusEl.textContent = "Local test runner not detected";
+      consoleOutputEl.textContent =
+        "To run `zig test` directly from this page, start the local server:\n\n" +
+        "  python3 web/server.py\n\n" +
+        "Then open http://127.0.0.1:8787";
+    } finally {
+      btnRun.disabled = false;
+    }
+  }
+
+  function switchView(viewName) {
+    document.querySelectorAll(".nav-tab").forEach((t) => {
+      t.classList.toggle("active", t.dataset.view === viewName);
+    });
+    document.querySelectorAll(".view").forEach((v) => {
+      v.classList.toggle("active", v.id === `view-${viewName}`);
+    });
+  }
+
+  // Event listeners
+  document.querySelectorAll(".nav-tab").forEach((tab) => {
+    tab.addEventListener("click", () => switchView(tab.dataset.view));
+  });
+
+  btnStartKatas.addEventListener("click", () => {
+    switchView("katas");
+    selectKata(0);
+  });
+
+  btnRun.addEventListener("click", runTests);
+
+  btnReset.addEventListener("click", () => {
+    const kata = katas[currentIdx];
+    showingSolution = false;
+    btnSolution.textContent = "Show Solution";
+    editorEl.value = kata.starter;
+    delete savedCode[kata.id];
+    saveJson(STORAGE_CODE_KEY, savedCode);
+    clearConsole();
+  });
+
+  btnSolution.addEventListener("click", () => {
+    const kata = katas[currentIdx];
+    showingSolution = !showingSolution;
+    if (showingSolution) {
+      savedCode[kata.id] = editorEl.value;
+      saveJson(STORAGE_CODE_KEY, savedCode);
+      editorEl.value = kata.solution;
+      btnSolution.textContent = "Back to My Code";
+    } else {
+      editorEl.value = savedCode[kata.id] ?? kata.starter;
+      btnSolution.textContent = "Show Solution";
+    }
+  });
+
+  btnPrev.addEventListener("click", () => {
+    if (currentIdx > 0) selectKata(currentIdx - 1);
+  });
+
+  btnNext.addEventListener("click", () => {
+    if (currentIdx < katas.length - 1) selectKata(currentIdx + 1);
+  });
+
+  editorEl.addEventListener("input", () => {
+    if (!showingSolution) {
+      const kata = katas[currentIdx];
+      savedCode[kata.id] = editorEl.value;
+      saveJson(STORAGE_CODE_KEY, savedCode);
+    }
+  });
+
+  editorEl.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+      e.preventDefault();
+      runTests();
+      return;
+    }
+    if (e.key === "Tab") {
+      e.preventDefault();
+      const start = editorEl.selectionStart;
+      const end = editorEl.selectionEnd;
+      editorEl.value = editorEl.value.slice(0, start) + "    " + editorEl.value.slice(end);
+      editorEl.selectionStart = editorEl.selectionEnd = start + 4;
+    }
+  });
+
+  // Check if local server is running
+  fetch("/api/health")
+    .then((r) => (r.ok ? r.json() : null))
+    .then((data) => {
+      if (data && data.ok) {
+        serverOnline = true;
+        clearConsole();
+      }
+    })
+    .catch(() => {});
+
+  updateProgress();
+  if (katas.length > 0) selectKata(0);
+})();
