@@ -11,38 +11,30 @@ const std = @import("std");
 
 /// Counts how many times `needle` appears in `haystack`.
 pub fn countOccurrences(haystack: []const u8, needle: u8) usize {
-    var count: usize = 0;
-    for (haystack) |byte| {
-        if (byte == needle) {
-            count += 1;
-        }
-    }
-    return count;
+    _ = haystack;
+    _ = needle;
+    @panic("TODO: implement countOccurrences");
 }
 
 /// Returns true if `text` starts with `prefix` (case-sensitive).
 pub fn hasPrefix(text: []const u8, prefix: []const u8) bool {
-    if (text.len < prefix.len) return false;
-    return std.mem.eql(u8, text[0..prefix.len], prefix);
+    _ = text;
+    _ = prefix;
+    @panic("TODO: implement hasPrefix");
 }
 
 /// Reverses `slice` in-place using a mutable slice `[]u8`.
 pub fn reverseInPlace(slice: []u8) void {
-    if (slice.len < 2) return;
-    var left: usize = 0;
-    var right: usize = slice.len - 1;
-    while (left < right) {
-        const tmp = slice[left];
-        slice[left] = slice[right];
-        slice[right] = tmp;
-        left += 1;
-        right -= 1;
-    }
+    _ = slice;
+    @panic("TODO: implement reverseInPlace");
 }
 
 /// Formats "<name>:<port>" into `buf` without heap allocation and returns the written slice.
 pub fn formatEndpoint(buf: []u8, host: []const u8, port: u16) ![]const u8 {
-    return std.fmt.bufPrint(buf, "{s}:{d}", .{ host, port });
+    _ = buf;
+    _ = host;
+    _ = port;
+    @panic("TODO: implement formatEndpoint");
 }
 
 test "countOccurrences" {

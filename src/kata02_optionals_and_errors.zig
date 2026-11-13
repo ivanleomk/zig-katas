@@ -21,35 +21,25 @@ pub const HostPort = struct {
 
 /// Finds the first index of `byte` in `slice`, or returns `null` if not found.
 pub fn indexOfByte(slice: []const u8, byte: u8) ?usize {
-    for (slice, 0..) |b, i| {
-        if (b == byte) return i;
-    }
-    return null;
+    _ = slice;
+    _ = byte;
+    @panic("TODO: implement indexOfByte");
 }
 
 /// Parses `"host:port"` into `HostPort`.
 /// Returns `error.EmptyInput` if empty, `error.MissingSeparator` if no `:`,
 /// or `error.InvalidPort` if the port isn't a valid u16.
 pub fn parseHostPort(input: []const u8) ParseError!HostPort {
-    if (input.len == 0) return error.EmptyInput;
-    const colon = indexOfByte(input, ':') orelse return error.MissingSeparator;
-    const host = input[0..colon];
-    if (host.len == 0) return error.EmptyInput;
-
-    const port_str = input[colon + 1 ..];
-    const port = std.fmt.parseInt(u16, port_str, 10) catch return error.InvalidPort;
-
-    return .{ .host = host, .port = port };
+    _ = input;
+    @panic("TODO: implement parseHostPort");
 }
 
 /// Parses `input`, falling back to `default_port` if `MissingSeparator` occurs.
 /// Any other error is still propagated!
 pub fn parsePortOrDefault(input: []const u8, default_port: u16) ParseError!u16 {
-    const hp = parseHostPort(input) catch |err| switch (err) {
-        error.MissingSeparator => return default_port,
-        else => |e| return e,
-    };
-    return hp.port;
+    _ = input;
+    _ = default_port;
+    @panic("TODO: implement parsePortOrDefault");
 }
 
 test "indexOfByte" {

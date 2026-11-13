@@ -22,35 +22,22 @@ pub fn RingBuffer(comptime T: type, comptime capacity: usize) type {
         len: usize = 0,
 
         pub fn push(self: *Self, value: T) bool {
-            if (self.len == capacity) return false;
-            const idx = (self.head + self.len) % capacity;
-            self.items[idx] = value;
-            self.len += 1;
-            return true;
+            _ = self;
+            _ = value;
+            @panic("TODO: implement RingBuffer.push");
         }
 
         pub fn pop(self: *Self) ?T {
-            if (self.len == 0) return null;
-            const val = self.items[self.head];
-            self.head = (self.head + 1) % capacity;
-            self.len -= 1;
-            return val;
+            _ = self;
+            @panic("TODO: implement RingBuffer.pop");
         }
     };
 }
 
 /// Sums all integer fields of any struct at compile-time-verified zero cost.
 pub fn sumStructFields(s: anytype) i64 {
-    const info = @typeInfo(@TypeOf(s));
-    if (info != .@"struct") @compileError("expected a struct");
-
-    var total: i64 = 0;
-    inline for (info.@"struct".field_names, info.@"struct".field_types) |name, FieldType| {
-        if (@typeInfo(FieldType) == .int) {
-            total += @as(i64, @field(s, name));
-        }
-    }
-    return total;
+    _ = s;
+    @panic("TODO: implement sumStructFields using @typeInfo and inline for");
 }
 
 test "RingBuffer(u32, 3)" {

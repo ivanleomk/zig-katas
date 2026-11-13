@@ -13,22 +13,10 @@ pub fn joinWithSep(
     parts: []const []const u8,
     sep: []const u8,
 ) std.mem.Allocator.Error![]u8 {
-    if (parts.len == 0) return allocator.alloc(u8, 0);
-
-    var total_len: usize = sep.len * (parts.len - 1);
-    for (parts) |p| total_len += p.len;
-
-    const out = try allocator.alloc(u8, total_len);
-    var pos: usize = 0;
-    for (parts, 0..) |p, i| {
-        if (i > 0) {
-            @memcpy(out[pos .. pos + sep.len], sep);
-            pos += sep.len;
-        }
-        @memcpy(out[pos .. pos + p.len], p);
-        pos += p.len;
-    }
-    return out;
+    _ = allocator;
+    _ = parts;
+    _ = sep;
+    @panic("TODO: implement joinWithSep");
 }
 
 /// Uses an `ArenaAllocator` internally for temporary scratch work,
@@ -37,18 +25,9 @@ pub fn upperCloneViaArena(
     backing_allocator: std.mem.Allocator,
     input: []const u8,
 ) std.mem.Allocator.Error![]u8 {
-    var arena = std.heap.ArenaAllocator.init(backing_allocator);
-    defer arena.deinit();
-    const tmp_alloc = arena.allocator();
-
-    // Scratch allocation on the arena — never individually freed!
-    const scratch = try tmp_alloc.alloc(u8, input.len);
-    for (input, 0..) |c, i| {
-        scratch[i] = std.ascii.toUpper(c);
-    }
-
-    // Copy final result onto backing_allocator so it outlives the arena.
-    return backing_allocator.dupe(u8, scratch);
+    _ = backing_allocator;
+    _ = input;
+    @panic("TODO: implement upperCloneViaArena");
 }
 
 test "joinWithSep" {

@@ -10,15 +10,9 @@ const std = @import("std");
 
 /// Filters `nums` to keep only even numbers, returning an owned slice.
 pub fn filterEvens(allocator: std.mem.Allocator, nums: []const i32) ![]i32 {
-    var list: std.ArrayList(i32) = .empty;
-    errdefer list.deinit(allocator);
-
-    for (nums) |n| {
-        if (@mod(n, 2) == 0) {
-            try list.append(allocator, n);
-        }
-    }
-    return list.toOwnedSlice(allocator);
+    _ = allocator;
+    _ = nums;
+    @panic("TODO: implement filterEvens");
 }
 
 /// Counts occurrences of each whitespace-separated word in `text`.
@@ -28,19 +22,9 @@ pub fn wordCounts(
     allocator: std.mem.Allocator,
     text: []const u8,
 ) !std.StringHashMap(usize) {
-    var map = std.StringHashMap(usize).init(allocator);
-    errdefer map.deinit();
-
-    var it = std.mem.tokenizeScalar(u8, text, ' ');
-    while (it.next()) |word| {
-        const gop = try map.getOrPut(word);
-        if (gop.found_existing) {
-            gop.value_ptr.* += 1;
-        } else {
-            gop.value_ptr.* = 1;
-        }
-    }
-    return map;
+    _ = allocator;
+    _ = text;
+    @panic("TODO: implement wordCounts");
 }
 
 test "filterEvens" {

@@ -17,17 +17,17 @@ pub const SemVer = struct {
 
     /// Formats SemVer as "v<major>.<minor>.<patch>".
     pub fn format(self: SemVer, w: *Io.Writer) Io.Writer.Error!void {
-        try w.print("v{d}.{d}.{d}", .{ self.major, self.minor, self.patch });
+        _ = self;
+        _ = w;
+        @panic("TODO: implement SemVer.format");
     }
 };
 
 /// Writes a CSV row of `items` into `w` separated by commas (with a trailing `\n`).
 pub fn writeCsvRow(w: *Io.Writer, items: []const []const u8) Io.Writer.Error!void {
-    for (items, 0..) |item, i| {
-        if (i > 0) try w.writeByte(',');
-        try w.writeAll(item);
-    }
-    try w.writeByte('\n');
+    _ = w;
+    _ = items;
+    @panic("TODO: implement writeCsvRow");
 }
 
 test "SemVer custom format with Io.Writer.fixed" {

@@ -16,17 +16,16 @@ pub const CPoint = extern struct {
 
 /// C-ABI function that adds two `CPoint` structs.
 pub export fn cpoint_add(a: CPoint, b: CPoint) callconv(.c) CPoint {
-    return .{
-        .x = a.x + b.x,
-        .y = a.y + b.y,
-    };
+    _ = a;
+    _ = b;
+    @panic("TODO: implement cpoint_add");
 }
 
 /// Converts a null-terminated C string `[*:0]const u8` into a Zig slice
 /// and returns its length (excluding the null terminator).
 pub fn cStringLen(c_str: [*:0]const u8) usize {
-    const slice: [:0]const u8 = std.mem.span(c_str);
-    return slice.len;
+    _ = c_str;
+    @panic("TODO: implement cStringLen");
 }
 
 test "CPoint C ABI layout and function" {

@@ -30,25 +30,15 @@ pub const FrameError = error{
 /// [2]:    flags (u8 bitcast)
 /// [3..7]: payload_len (big-endian u32)
 pub fn encodeHeader(header: FrameHeader) [7]u8 {
-    var buf: [7]u8 = undefined;
-    std.mem.writeInt(u16, buf[0..2], header.magic, .little);
-    buf[2] = @bitCast(header.flags);
-    std.mem.writeInt(u32, buf[3..7], header.payload_len, .big);
-    return buf;
+    _ = header;
+    @panic("TODO: implement encodeHeader");
 }
 
 /// Decodes a 7-byte wire header from `bytes`.
 /// Returns `error.Truncated` if `bytes.len < 7`, or `error.BadMagic` if `magic != 0xCAFE`.
 pub fn decodeHeader(bytes: []const u8) FrameError!FrameHeader {
-    if (bytes.len < 7) return error.Truncated;
-    const magic = std.mem.readInt(u16, bytes[0..2], .little);
-    if (magic != 0xCAFE) return error.BadMagic;
-
-    return .{
-        .magic = magic,
-        .flags = @bitCast(bytes[2]),
-        .payload_len = std.mem.readInt(u32, bytes[3..7], .big),
-    };
+    _ = bytes;
+    @panic("TODO: implement decodeHeader");
 }
 
 test "encodeHeader and decodeHeader roundtrip" {

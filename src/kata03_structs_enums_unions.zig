@@ -15,10 +15,8 @@ pub const Status = enum {
     failed,
 
     pub fn isTerminal(self: Status) bool {
-        return switch (self) {
-            .pending, .running => false,
-            .passed, .failed => true,
-        };
+        _ = self;
+        @panic("TODO: implement Status.isTerminal");
     }
 };
 
@@ -35,22 +33,9 @@ pub const Job = struct {
     started_at_ms: ?u64 = null,
 
     pub fn apply(self: *Job, ev: Event) void {
-        switch (ev) {
-            .start => |ts| {
-                self.status = .running;
-                self.started_at_ms = ts;
-                self.percent = 0;
-            },
-            .progress => |pct| {
-                if (!self.status.isTerminal()) {
-                    self.percent = @min(pct, 100);
-                }
-            },
-            .finish => |ok| {
-                self.status = if (ok) .passed else .failed;
-                if (ok) self.percent = 100;
-            },
-        }
+        _ = self;
+        _ = ev;
+        @panic("TODO: implement Job.apply");
     }
 };
 

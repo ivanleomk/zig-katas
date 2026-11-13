@@ -21,34 +21,17 @@ pub fn buildWithRollback(
     fail_step_two: bool,
     fail_step_three: bool,
 ) (std.mem.Allocator.Error || StepError)![]u8 {
-    const result = try allocator.alloc(u8, 4);
-    errdefer allocator.free(result);
-
-    if (fail_step_two) return error.StepTwoFailed;
-
-    const scratch = try allocator.alloc(u8, 8);
-    defer allocator.free(scratch);
-
-    @memset(scratch, 'x');
-    if (fail_step_three) return error.StepThreeFailed;
-
-    @memcpy(result, scratch[0..4]);
-    return result;
+    _ = allocator;
+    _ = fail_step_two;
+    _ = fail_step_three;
+    @panic("TODO: implement buildWithRollback using defer and errdefer");
 }
 
 /// Appends `'A'`, `'B'`, `'C'` to `log` in LIFO order using `defer`!
 /// Hint: `defer` statements execute in reverse order of registration.
 pub fn appendLifo(log: *[3]u8) void {
-    var idx: usize = 0;
-    defer log[idx] = 'C';
-    defer {
-        log[idx] = 'B';
-        idx += 1;
-    }
-    defer {
-        log[idx] = 'A';
-        idx += 1;
-    }
+    _ = log;
+    @panic("TODO: implement appendLifo using defer");
 }
 
 test "buildWithRollback frees everything on error and returns owned slice on success" {
