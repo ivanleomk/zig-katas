@@ -62,6 +62,11 @@ class KataHandler(http.server.SimpleHTTPRequestHandler):
             return
 
         start = time.monotonic()
+        cache_dir = Path(tempfile.gettempdir()) / "zig_katas_global_cache"
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        env = dict(os.environ)
+        env["ZIG_GLOBAL_CACHE_DIR"] = str(cache_dir)
+
         with tempfile.TemporaryDirectory(prefix="zig_kata_") as tmpdir:
             kata_path = Path(tmpdir) / "kata.zig"
             kata_path.write_text(code, encoding="utf-8")
@@ -69,9 +74,10 @@ class KataHandler(http.server.SimpleHTTPRequestHandler):
                 proc = subprocess.run(
                     [ZIG_BIN, "test", str(kata_path)],
                     cwd=tmpdir,
+                    env=env,
                     capture_output=True,
                     text=True,
-                    timeout=12,
+                    timeout=20,
                 )
                 duration_ms = int((time.monotonic() - start) * 1000)
                 self._send_json(
@@ -115,9 +121,12 @@ class KataHandler(http.server.SimpleHTTPRequestHandler):
 
 
 def main():
+    default_port = int(os.environ.get("PORT", "8787"))
+    default_host = "0.0.0.0" if "PORT" in os.environ else "127.0.0.1"
+
     parser = argparse.ArgumentParser(description="Run zig-katas interactive web server")
-    parser.add_argument("--host", default="127.0.0.1")
-    parser.add_argument("--port", type=int, default=8787)
+    parser.add_argument("--host", default=default_host)
+    parser.add_argument("--port", type=int, default=default_port)
     args = parser.parse_args()
 
     server = http.server.ThreadingHTTPServer((args.host, args.port), KataHandler)
